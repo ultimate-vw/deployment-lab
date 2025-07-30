@@ -1,0 +1,17 @@
+http:
+  routers:
+    canary:
+      rule: "Host(`localhost`)"
+      service: canary-service
+      entrypoints:
+        - web
+  services:
+    canary-service:
+      weighted:
+        services:
+          - name: backend-v1
+            weight: 8
+          - name: backend-v2
+            weight: 2
+        sticky:
+          cookie: {}
