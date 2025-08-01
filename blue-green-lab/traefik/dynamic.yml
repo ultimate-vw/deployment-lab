@@ -2,18 +2,18 @@ http:
   routers:
     blue-green-router:
       rule: "Host(`localhost`)"
-      service: blue-green-service
+      service: backend-v1@docker
       entrypoints:
         - web
 
-  services:
-    blue-green-service:
-      weighted:
-        services:
-          - name: backend-v1@docker
-            weight: 8
-          - name: backend-v2@docker
-            weight: 2
+#  services:
+#    blue-green-service:
+#      weighted:
+#        services:
+#          - name: backend-v1@docker
+#            weight: 8
+#          - name: backend-v2@docker
+#            weight: 2
 
 #        sticky:
 #          cookie: {}

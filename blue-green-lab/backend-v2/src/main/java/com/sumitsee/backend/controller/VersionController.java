@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class VersionController {
     @GetMapping("/api/versions")
     public String getVersion() {
-        return "v2"; // or "v2", "blue", "green", etc
+        return "Hi I am green!"; // or "v2", "blue", "green", etc
     }
 
 }
