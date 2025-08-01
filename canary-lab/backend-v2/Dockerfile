@@ -26,6 +26,6 @@ RUN mkdir -p /var/log/app
 # If you want Spring Boot to use custom logback config
 # ENV SPRING_LOGGING_CONFIG=file:./logback-spring.xml
 
-EXPOSE 8081
+EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
