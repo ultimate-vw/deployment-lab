@@ -1,17 +1,16 @@
 http:
   routers:
-    canary:
+    blue-green-router:
       rule: "Host(`localhost`)"
-      service: canary-service
+      service: blue-green-service
       entrypoints:
         - web
+
   services:
-    canary-service:
+    blue-green-service:
       weighted:
         services:
-          - name: backend-v1
+          - name: backend-v1@docker
             weight: 8
-          - name: backend-v2
+          - name: backend-v2@docker
             weight: 2
-        sticky:
-          cookie: {}
