@@ -1,0 +1,14 @@
+http:
+  routers:
+    dark-launch-router:
+      rule: "Host(`localhost`)"
+      entrypoints: [web]
+      service: dark-launch-service
+
+  services:
+    dark-launch-service:
+      mirroring:
+        service: backend-v1
+        mirrors:
+          - name: backend-v2
+            percent: 100   # (100 = every request mirrored. Use less for partial)
