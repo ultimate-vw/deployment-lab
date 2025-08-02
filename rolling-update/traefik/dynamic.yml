@@ -1,0 +1,25 @@
+http:
+  routers:
+    blue-green-router:
+      rule: "Host(`localhost`)"
+      service: blue-green-service
+      entrypoints:
+        - web
+
+  services:
+    blue-green-service:
+      weighted:
+        services:
+          - name: backend-v1@docker
+            weight: 8
+          - name: backend-v2@docker
+            weight: 2
+
+#        sticky:
+#          cookie: {}
+# If you enable sticky, each session, machine, client is alwways redirected to the same machine no matter what
+# so consider using this scenario in production
+# if your service has cart function the request should go to the same server no matter what
+# int hat case we need sticky
+
+# for our lab experiment we are not using it so the same browser can be used to test the functionality
