@@ -1,0 +1,10 @@
+http:
+  routers:
+    app-a:
+      rule: "Host(`localhost`) && Header(`X-Variant`,`A`)"
+      entrypoints: [web]
+      service: backend-v1@docker
+    app-b:
+      rule: "Host(`localhost`) && Header(`X-Variant`,`B`)"
+      entrypoints: [web]
+      service: backend-v2@docker

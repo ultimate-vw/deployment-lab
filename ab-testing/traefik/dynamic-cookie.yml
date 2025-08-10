@@ -1,0 +1,20 @@
+http:
+  routers:
+    app:
+      rule: "Host(`localhost`)"
+      entrypoints: [web]
+      service: ab-cookie
+
+  services:
+    ab-cookie:
+      weighted:
+        sticky:
+          cookie:
+            name: ab_variant
+            httpOnly: true
+            secure: false
+        services:
+          - name: backend-v1@docker
+            weight: 5
+          - name: backend-v2@docker
+            weight: 5
