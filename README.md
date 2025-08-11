@@ -178,58 +178,7 @@ Run a new indexing or processing pipeline alongside the old one, compare outputs
 ✅ Benefits: Validate changes in background.
 
 ```mermaid
-flowchart LR 
-    
-%% --- Blue-Green ---
-    subgraph BG["Blue-Green"]
-        direction LR
-        TBG["Traffic"] --> LB{"Switch?"}
-        LB -- "Blue" --> BL["Blue Env 🌊"]
-        LB -- "Green" --> GR["Green Env 🌿"]
-        BL --> PROD1["Live Users"]
-        GR --> PROD1
-    end
-
-%% --- Canary ---
-    subgraph CN["Canary"]
-        direction LR
-        U2["Users"] --> CANA{"% Canary"}
-        CANA -- "Small %" --> CV["Canary Version 🐤"]
-        CANA -- "Rest" --> SV["Stable Version"]
-        CV --> MON["Monitor"]
-        MON --> DEC{"Healthy?"}
-        DEC -- "Yes" --> ROLL["Rollout More"]
-        DEC -- "No" --> RB2["Rollback"]
-    end
-
-%% --- Dark Launch ---
-    subgraph DL["Dark Launch"]
-        direction LR
-        U3["Users"] --> FE["Feature Disabled"]
-        INT["Internal Users"] --> FEI["Feature Enabled"]
-        FEI --> MON2["Monitor"]
-        MON2 --> ADJ["Adjust"]
-    end
-
-%% --- Feature Toggle ---
-    subgraph FT["Feature Toggle"]
-        direction LR
-        CODE["Code with Toggles"] --> CFG{"Toggle On?"}
-        CFG -- "Yes" --> ENF["Enable Feature"]
-        CFG -- "No" --> DISF["Disable Feature"]
-    end
-
-%% --- Rolling Update ---
-    subgraph RU["Rolling Update"]
-        direction LR
-        N1["Node 1"] --> UP1["Update"]
-        N2["Node 2"] --> UP2["Update"]
-        N3["Node 3"] --> UP3["Update"]
-        UP1 --> MON3["Monitor"]
-        UP2 --> MON3
-        UP3 --> MON3
-    end
-
+flowchart LR
 %% --- Shadow Indexing ---
     subgraph SI["Shadow Indexing"]
         direction LR
