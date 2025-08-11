@@ -22,11 +22,73 @@ Each strategy includes:
 Run two versions (Blue & Green) side-by-side. Flip traffic instantly between them via Traefik config.  
 ✅ Benefits: Zero-downtime, instant rollback, no mixed-version state.
 
+
+```mermaid
+
+flowchart LR
+%% Blue–Green Deployment
+    subgraph BlueEnv["Blue Environment (v1) - Current Production"]
+        B1[Running v1 Application]
+        DB1[(Database)]
+    end
+
+    subgraph GreenEnv["Green Environment (v2) - New Release"]
+        G1[Running v2 Application]
+        DB2[(Database)]
+    end
+
+    User[User Requests] --> LB[Load Balancer]
+
+%% Step 1: Blue live
+    LB --> B1
+    B1 --> DB1
+
+%% Step 2: Deploy Green in parallel
+    Deploy[Deploy New Version to Green] --> G1
+    G1 --> DB2
+
+%% Step 3: Switch traffic
+    Switch[Switch Load Balancer] --> LB
+    LB --> G1
+
+%% Step 4: Blue idle, fallback
+    NoteBlue[Blue kept for rollback] --> B1
+
+%% Styling
+    classDef blue fill:#3498db,stroke:#1f618d,stroke-width:2px,color:#fff;
+    classDef green fill:#2ecc71,stroke:#1e8449,stroke-width:2px,color:#fff;
+    classDef infra fill:#95a5a6,stroke:#7f8c8d,stroke-width:2px,color:#fff;
+
+    class B1,DB1,NoteBlue blue;
+    class G1,DB2 green;
+    class LB,Deploy,Switch,User infra;
+
+
+```
+
 ---
 
 ### 2. [Canary Deployment](canary-lab/README.md)
 Gradually shift traffic from the old version to the new version in small increments (e.g., 10%, 30%, 50%, etc.) before full rollout.  
 ✅ Benefits: Gradual exposure, better risk management.
+
+
+```mermaid
+
+flowchart LR
+    
+  %% --- Canary ---
+  subgraph CN["Canary"]
+    direction LR
+    U2["Users"] --> CANA{"% Canary"}
+    CANA -- "Small %" --> CV["Canary Version 🐤"]
+    CANA -- "Rest" --> SV["Stable Version"]
+    CV --> MON["Monitor"]
+    MON --> DEC{"Healthy?"}
+    DEC -- "Yes" --> ROLL["Rollout More"]
+    DEC -- "No" --> RB2["Rollback"]
+  end
+```
 
 ---
 
@@ -34,11 +96,38 @@ Gradually shift traffic from the old version to the new version in small increme
 Mirror live traffic to a new version without impacting users. The shadow version runs silently for validation.  
 ✅ Benefits: Real traffic testing without user risk.
 
+```mermaid
+flowchart LR
+  %% --- Dark Launch ---
+  subgraph DL["Dark Launch"]
+    direction LR
+    U3["Users"] --> FE["Feature Disabled"]
+    INT["Internal Users"] --> FEI["Feature Enabled"]
+    FEI --> MON2["Monitor"]
+    MON2 --> ADJ["Adjust"]
+  end
+  
+```
 ---
 
 ### 4. [Rolling Update](rolling-update/README.md)
 Replace instances of the old version with the new version gradually, without requiring double capacity.  
 ✅ Benefits: Balanced resource usage, no downtime.
+
+```mermaid
+
+flowchart LR
+  %% --- Rolling Update ---
+  subgraph RU["Rolling Update"]
+    direction LR
+    N1["Node 1"] --> UP1["Update"]
+    N2["Node 2"] --> UP2["Update"]
+    N3["Node 3"] --> UP3["Update"]
+    UP1 --> MON3["Monitor"]
+    UP2 --> MON3
+    UP3 --> MON3
+  end
+```
 
 
 ---
@@ -47,17 +136,111 @@ Replace instances of the old version with the new version gradually, without req
 Deploy features hidden behind toggles; enable or disable them dynamically without redeploying.  
 ✅ Benefits: Decouple deployment from release, safer experiments.
 
+```mermaid
+flowchart LR
+  %% --- Feature Toggle ---
+  subgraph FT["Feature Toggle"]
+    direction LR
+    CODE["Code with Toggles"] --> CFG{"Toggle On?"}
+    CFG -- "Yes" --> ENF["Enable Feature"]
+    CFG -- "No" --> DISF["Disable Feature"]
+  end
+```
+
 ---
 
 ### 6. [A/B Testing Deployment](ab-testing/README.md)
 Route users to different versions based on rules (e.g., 50% to A, 50% to B) to test features and measure results.  
 ✅ Benefits: Data-driven decision-making.
 
+```mermaid
+flowchart LR
+%% --- A/B Testing ---
+    subgraph AB["A/B Testing"]
+        direction LR
+        U1["Users 👥"] --> ST1{"Split Traffic"}
+        ST1 -- "50%" --> VA1["Version A 🚀"]
+        ST1 -- "50%" --> VB1["Version B ⚡"]
+        VA1 --> MA1["Metrics A 📊"]
+        VB1 --> MB1["Metrics B 📈"]
+        MA1 --> CR1{"Compare"}
+        MB1 --> CR1
+        CR1 -- "Winner" --> DW1["Deploy 🏆"]
+        CR1 -- "No Winner" --> RB1["Rollback 🔄"]
+    end
+
+```
+
 ---
 
 ### 7. [Shadow Indexing Deployment](shadow-indexing-lab/README.md)
 Run a new indexing or processing pipeline alongside the old one, compare outputs without affecting production results.  
 ✅ Benefits: Validate changes in background.
+
+```mermaid
+flowchart LR 
+    
+%% --- Blue-Green ---
+    subgraph BG["Blue-Green"]
+        direction LR
+        TBG["Traffic"] --> LB{"Switch?"}
+        LB -- "Blue" --> BL["Blue Env 🌊"]
+        LB -- "Green" --> GR["Green Env 🌿"]
+        BL --> PROD1["Live Users"]
+        GR --> PROD1
+    end
+
+%% --- Canary ---
+    subgraph CN["Canary"]
+        direction LR
+        U2["Users"] --> CANA{"% Canary"}
+        CANA -- "Small %" --> CV["Canary Version 🐤"]
+        CANA -- "Rest" --> SV["Stable Version"]
+        CV --> MON["Monitor"]
+        MON --> DEC{"Healthy?"}
+        DEC -- "Yes" --> ROLL["Rollout More"]
+        DEC -- "No" --> RB2["Rollback"]
+    end
+
+%% --- Dark Launch ---
+    subgraph DL["Dark Launch"]
+        direction LR
+        U3["Users"] --> FE["Feature Disabled"]
+        INT["Internal Users"] --> FEI["Feature Enabled"]
+        FEI --> MON2["Monitor"]
+        MON2 --> ADJ["Adjust"]
+    end
+
+%% --- Feature Toggle ---
+    subgraph FT["Feature Toggle"]
+        direction LR
+        CODE["Code with Toggles"] --> CFG{"Toggle On?"}
+        CFG -- "Yes" --> ENF["Enable Feature"]
+        CFG -- "No" --> DISF["Disable Feature"]
+    end
+
+%% --- Rolling Update ---
+    subgraph RU["Rolling Update"]
+        direction LR
+        N1["Node 1"] --> UP1["Update"]
+        N2["Node 2"] --> UP2["Update"]
+        N3["Node 3"] --> UP3["Update"]
+        UP1 --> MON3["Monitor"]
+        UP2 --> MON3
+        UP3 --> MON3
+    end
+
+%% --- Shadow Indexing ---
+    subgraph SI["Shadow Indexing"]
+        direction LR
+        W["Write"] --> IDX["Update Index"]
+        W --> LOC["Local Store"]
+        W --> REM["Remote Store"]
+        RQ["Read"] --> IDX
+        IDX -- "Local" --> LOC --> RESP["Return"]
+        IDX -- "Remote" --> REM --> RESP
+    end
+```
 
 ---
 
