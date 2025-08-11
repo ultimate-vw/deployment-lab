@@ -1,0 +1,34 @@
+http:
+  routers:
+    reads:
+      rule: "Host(`localhost`) && PathPrefix(`/api/search`) && Method(`GET`)"
+      entrypoints: [web]
+      service: primary
+    writes:
+      rule: "Host(`localhost`) && PathPrefix(`/api/docs`) && (Method(`POST`) || Method(`DELETE`))"
+      entrypoints: [web]
+      service: mirror
+    index-inspect:
+      rule: "Host(`localhost`) && PathPrefix(`/api/index`)"
+      entrypoints: [web]
+      service: primary
+    version:
+      rule: "Host(`localhost`) && PathPrefix(`/api/version`)"
+      entrypoints: [web]
+      service: primary
+
+  services:
+    primary:
+      loadBalancer:
+        servers:
+          - url: "http://backend-v1:8080"
+    candidate:
+      loadBalancer:
+        servers:
+          - url: "http://backend-v2:8080"
+    mirror:
+      mirroring:
+        service: primary
+        mirrors:
+          - name: candidate
+            percent: 100
