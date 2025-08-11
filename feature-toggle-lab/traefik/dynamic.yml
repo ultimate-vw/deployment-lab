@@ -1,0 +1,6 @@
+http:
+  routers:
+    app:
+      rule: "Host(`localhost`) && PathPrefix(`/api`)"
+      entrypoints: [web]
+      service: backend@docker      # <— reference the Docker service directly
