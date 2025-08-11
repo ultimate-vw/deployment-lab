@@ -4,71 +4,101 @@ This repository contains multiple implementations of modern **deployment strateg
 using **Docker, Traefik, and Kubernetes**.  
 The aim is to provide hands-on examples for each strategy and demonstrate their application in real-world systems.
 
----
 
-## Implemented Strategies
+# Deployment Strategies Lab — Consolidated Guide
 
-### 1. **AB Testing**
-- Purpose: Route different subsets of users to different versions based on attributes (e.g., cookies, headers).
-- Tools: **Traefik (file provider)**.
-- 
-- Diagram:
-  ![AB Testing](Docs/deployment_strategy_diagrams/ab-testing/01-header-routing.png)
-  ![AB Testing](Docs/deployment_strategy_diagrams/ab-testing/02-cookie-sticky.png)
+This repository contains hands-on labs for multiple deployment strategies implemented using **Docker**, **Traefik**, and in some cases **Kubernetes**.
 
-- 
+Each strategy includes:
+- Full working code (Spring Boot backend services, Traefik reverse proxy configuration, and Docker Compose setup)
+- A detailed README explaining the strategy, steps to run, production considerations, and example configurations.
+- Diagrams showing the traffic flow and cutover process.
 
 ---
 
-### 2. **Blue-Green Deployment**
-- Purpose: Run two environments (Blue and Green) simultaneously; switch traffic from one to another.
-- Tools: **Traefik**, **Docker Compose**.
-- Derived Strategies:
-    - **Recreate**: Similar to Blue-Green but instead of switching traffic, the old version is stopped before the new one starts.
-- Diagram:
-  ![Blue-Green](./docs/diagrams/blue-green.png)
+## Strategies
+
+### 1. [Blue–Green Deployment](blue-green-lab/README.md)
+Run two versions (Blue & Green) side-by-side. Flip traffic instantly between them via Traefik config.  
+✅ Benefits: Zero-downtime, instant rollback, no mixed-version state.
 
 ---
 
-### 3. **Canary Release**
-- Purpose: Gradually shift traffic from the stable version to the new one, monitoring for issues before full rollout.
-- Tools: **Traefik weighted services**.
-- Diagram:
-  ![Canary](./docs/diagrams/canary.png)
+### 2. [Canary Deployment](canary-lab/README.md)
+Gradually shift traffic from the old version to the new version in small increments (e.g., 10%, 30%, 50%, etc.) before full rollout.  
+✅ Benefits: Gradual exposure, better risk management.
 
 ---
 
-### 4. **Dark Launch (Shadow Traffic)**
-- Purpose: Send a copy of production traffic to a new service for testing without impacting users.
-- Tools: **Traefik mirroring**.
-- Diagram:
-  ![Dark Launch](./docs/diagrams/dark-launch.png)
+### 3. [Dark Launch (Shadow Traffic)](dark-launch/README.md)
+Mirror live traffic to a new version without impacting users. The shadow version runs silently for validation.  
+✅ Benefits: Real traffic testing without user risk.
 
 ---
 
-### 5. **Feature Toggle**
-- Purpose: Enable/disable features without deploying new code.
-- Tools: **Spring Boot**, **Docker Compose**, **Traefik**.
-- Diagram:
-  ![Feature Toggle](./docs/diagrams/feature-toggle.png)
+### 4. [Rolling Update](rolling-update/README.md)
+Replace instances of the old version with the new version gradually, without requiring double capacity.  
+✅ Benefits: Balanced resource usage, no downtime.
+
 
 ---
 
-### 6. **Rolling Update (Kubernetes)**
-- Purpose: Incrementally update pods with the new version while keeping the service available.
-- Tools: **Kubernetes Deployments**.
-- Note: Rolling Updates are implemented on **Kubernetes** using **Minikube**.
-    - For any Kubernetes-based deployment strategy, we can **refer to Rolling Update** as the baseline setup.
-- Diagram:
-  ![Rolling Update](./docs/diagrams/rolling-update.png)
+### 5. [Feature Toggle Deployment](feature-toggle-lab/README.md)
+Deploy features hidden behind toggles; enable or disable them dynamically without redeploying.  
+✅ Benefits: Decouple deployment from release, safer experiments.
 
 ---
 
-### 7. **Shadow Indexing**
-- Purpose: Test a new indexing/search system in parallel with the production one.
-- Tools: **Custom backend**, **parallel index processing**.
-- Diagram:
-  ![Shadow Indexing](./docs/diagrams/shadow-indexing.png)
+### 6. [A/B Testing Deployment](ab-testing/README.md)
+Route users to different versions based on rules (e.g., 50% to A, 50% to B) to test features and measure results.  
+✅ Benefits: Data-driven decision-making.
+
+---
+
+### 7. [Shadow Indexing Deployment](shadow-indexing-lab/README.md)
+Run a new indexing or processing pipeline alongside the old one, compare outputs without affecting production results.  
+✅ Benefits: Validate changes in background.
+
+---
+
+## Common Tools & Components
+
+- **[Traefik](https://doc.traefik.io/traefik/)** — Reverse proxy, routing, load balancing.
+- **Spring Boot** — Backend REST services.
+- **Docker Compose** — Multi-service local environments.
+- **Kubernetes** — For some strategies (e.g., rolling updates in K8s).
+
+---
+
+## How to Navigate
+
+- Each lab is in its own folder (e.g., `blue-green-lab/`, `canary-lab/`).
+- Each lab contains its own `README.md` and runnable code.
+- `Docs/` folder contains global documentation and diagrams (`deployment_strategy_diagrams/`).
+
+---
+
+## Running a Lab
+
+```bash
+cd blue-green-lab   # or any other strategy folder
+docker compose up --build
+```
+
+Follow the lab-specific README for verification steps and strategy explanation.
+
+---
+
+## Diagrams
+
+Visual diagrams for all strategies are available in:  
+[deployment_strategy_diagrams/](deployment_strategy_diagrams/)
+
+---
+
+## License
+
+This project is licensed under the MIT License.
 
 ---
 
