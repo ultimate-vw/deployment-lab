@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  traefik:
+    image: traefik:v3.0
+    command: ["--configFile=/etc/traefik/traefik.yml"]
+    ports: ["80:80","8080:8080"]
+    volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on: [backend-v1, backend-v2]
+  backend-v1:
+    build: backend-v1
+    expose: ["8080"]
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.backend-v1.loadbalancer.server.port=8080
+  backend-v2:
+    build: backend-v2
+    expose: ["8080"]
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.backend-v2.loadbalancer.server.port=8080
